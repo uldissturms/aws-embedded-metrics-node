@@ -90,6 +90,25 @@ test('putMetric adds metric to metrics key', () => {
   expect(metricDatum.unit).toBe(expectedUnit);
 });
 
+test('multiple putMetric() calls to the same key append values to an array', () => {
+  // arrange
+  const context = MetricsContext.empty();
+  const expectedKey = faker.random.word();
+  const expectedUnit = faker.random.word();
+  const expectedValue1 = faker.random.number();
+  const expectedValue2 = faker.random.number();
+
+  // act
+  context.putMetric(expectedKey, expectedValue1, expectedUnit);
+  context.putMetric(expectedKey, expectedValue2, expectedUnit);
+
+  // assert
+  const metricDatum: any = context.metrics.get(expectedKey);
+  expect(metricDatum).toBeTruthy();
+  expect(metricDatum.value).toStrictEqual([expectedValue1, expectedValue2]);
+  expect(metricDatum.unit).toBe(expectedUnit);
+});
+
 test('putMetric uses None unit if not provided', () => {
   // arrange
   const context = MetricsContext.empty();
@@ -105,6 +124,25 @@ test('putMetric uses None unit if not provided', () => {
   expect(metricDatum).toBeTruthy();
   expect(metricDatum.value).toBe(expectedValue);
   expect(metricDatum.unit).toBe(expectedUnit);
+});
+
+test('putMetric does not accept non numeric values', () => {
+  // arrange
+  const context = MetricsContext.empty();
+  const key = faker.random.word();
+  const unit = 'None';
+
+  // act
+  // @ts-ignore
+  context.putMetric(key, '1');
+  // @ts-ignore
+  context.putMetric(key, {});
+  // @ts-ignore
+  context.putMetric(key, null);
+
+  // assert
+  const metricDatum: any = context.metrics.get(key);
+  expect(metricDatum).toBeFalsy();
 });
 
 test('createCopyWithContext creates new instance', () => {

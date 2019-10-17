@@ -14,11 +14,26 @@
  */
 
 export class MetricDatum {
-  public value: number;
+  public value: number | number[];
   public unit: string;
 
-  constructor(value: number, unit?: string) {
+  constructor(value: number | number[], unit?: string) {
     this.value = value;
     this.unit = unit || 'None';
+  }
+
+  /**
+   * Adds a new measurement value to this instance.
+   * Calls to this will convert a scalar numeric value to
+   * an array.
+   *
+   * @param newValue the value to append
+   */
+  public addMeasurement(newValue: number): void {
+    if (Array.isArray(this.value)) {
+      this.value.push(newValue);
+    } else {
+      this.value = [this.value, newValue];
+    }
   }
 }

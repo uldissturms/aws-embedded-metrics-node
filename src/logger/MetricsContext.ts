@@ -121,7 +121,17 @@ export class MetricsContext {
   }
 
   public putMetric(key: string, value: number, unit?: string) {
-    this.metrics.set(key, new MetricDatum(value, unit));
+    if (typeof value !== 'number') {
+      LOG(`Received invalid metric value for key`, key, value);
+      return;
+    }
+
+    const currentValue = this.metrics.get(key);
+    if (currentValue) {
+      currentValue.addMeasurement(value);
+    } else {
+      this.metrics.set(key, new MetricDatum(value, unit));
+    }
   }
 
   /**

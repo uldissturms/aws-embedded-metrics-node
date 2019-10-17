@@ -63,25 +63,6 @@ test('can put metric', async () => {
   expect(actualMetric!.unit).toBe('None');
 });
 
-test('put metric overwrites previous calls using same key', async () => {
-  // arrange
-  const expectedKey = faker.random.word();
-  const expectedValue = faker.random.number();
-
-  // act
-  logger.putMetric(expectedKey, faker.random.number());
-  logger.putMetric(expectedKey, faker.random.number());
-  logger.putMetric(expectedKey, expectedValue);
-  await logger.flush();
-
-  // assert
-  expect(sink.events).toHaveLength(1);
-  const actualMetric = sink.events[0].metrics.get(expectedKey);
-  expect(actualMetric).toBeTruthy();
-  expect(actualMetric!.value).toBe(expectedValue);
-  expect(actualMetric!.unit).toBe('None');
-});
-
 test('can put dimension', async () => {
   // arrange
   const expectedKey = faker.random.word();
